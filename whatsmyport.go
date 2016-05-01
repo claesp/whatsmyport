@@ -1,14 +1,14 @@
 package main
 
 import (
-	"os"
 	"fmt"
-	"log"
-	"regexp"
-	"strings"
-	"strconv"
 	"io/ioutil"
+	"log"
 	"net/http"
+	"os"
+	"regexp"
+	"strconv"
+	"strings"
 )
 
 var services_tcp map[int]string
@@ -40,12 +40,12 @@ func load() {
 			if port != 0 && err == nil {
 				completedDescription := fmt.Sprintf("%s (%s)", name, description)
 				switch protocol {
-					case "tcp":
-						services_tcp[port] = completedDescription
-					case "udp":
-						services_udp[port] = completedDescription
-					case "ddp":
-						services_ddp[port] = completedDescription
+				case "tcp":
+					services_tcp[port] = completedDescription
+				case "udp":
+					services_udp[port] = completedDescription
+				case "ddp":
+					services_ddp[port] = completedDescription
 				}
 			}
 		}
@@ -65,7 +65,7 @@ func root(w http.ResponseWriter, r *http.Request) {
 	tcp_desc := services_tcp[port]
 	udp_desc := services_udp[port]
 	ddp_desc := services_ddp[port]
-	
+
 	if tcp_desc != "" {
 		fmt.Fprintf(w, "%d/tcp: %s\n", port, tcp_desc)
 	}
@@ -81,7 +81,7 @@ func root(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	load()
-	http.HandleFunc("/", root) 
+	http.HandleFunc("/", root)
 
 	log.Println("Starting, listening on :30004")
 	log.Fatal(http.ListenAndServe(":30004", nil))
