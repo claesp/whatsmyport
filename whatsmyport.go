@@ -28,25 +28,45 @@ func load() {
 
 	fileDataStr := string(fileData)
 	lines := strings.Split(fileDataStr, "\n")
-	r := regexp.MustCompile("([a-z-]+)\\s*([0-9]+)/([tcp|udp|ddp]+).*#(.*)$")
+	r := regexp.MustCompile("([0-9a-z-]+)\\s*([0-9]+)/([tcp|udp|ddp]+).*#(.*)$")
+	r2 := regexp.MustCompile("([0-9a-z-]+)\\s*([0-9]+)/([tcp|udp|ddp]+).*$")
 	for _, line := range lines {
-		matches := r.FindStringSubmatch(line)
-		if len(matches) > 4 {
-			name := matches[1]
-			port, err := strconv.Atoi(matches[2])
-			protocol := matches[3]
-			description := strings.TrimSpace(matches[4])
+		var name string
+		var port int
+		var protocol string
+		var description string
+		var err error
 
-			if port != 0 && err == nil {
-				completedDescription := fmt.Sprintf("%s (%s)", name, description)
-				switch protocol {
-				case "tcp":
-					services_tcp[port] = completedDescription
-				case "udp":
-					services_udp[port] = completedDescription
-				case "ddp":
-					services_ddp[port] = completedDescription
-				}
+		matches := r.FindStringSubmatch(line)
+		if len(matches) == 5 {
+			name = matches[1]
+			port, err = strconv.Atoi(matches[2])
+			protocol = matches[3]
+			description = strings.TrimSpace(matches[4])
+		} else {
+			alt_matches := r2.FindStringSubmatch(line)
+			if len(alt_matches) == 4 {
+				name = alt_matches[1]
+				port, err = strconv.Atoi(alt_matches[2])
+				protocol = alt_matches[3]
+			}
+		}
+
+		if port != 0 && err == nil {
+			var completeDescription string
+			if description != "" {
+				completeDescription = fmt.Sprintf("%s (%s)", name, description)
+			} else {
+				completeDescription = fmt.Sprintf("%s", name)
+			}
+
+			switch protocol {
+			case "tcp":
+				services_tcp[port] = completeDescription
+			case "udp":
+				services_udp[port] = completeDescription
+			case "ddp":
+				services_ddp[port] = completeDescription
 			}
 		}
 	}
